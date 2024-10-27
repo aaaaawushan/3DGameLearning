@@ -28,8 +28,59 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private Transform cameraTransform;//カメラから参考
 
+    ///<summary>
+    ///重力加速度
+    ///</summary>
+    private float gravity = -9.81f;
+
+    ///<summary>
+    ///y軸に対しての速度
+    ///</summary>
+    private float verticalVelocity = 0f;
+
+    ///<summary>
+    ///接地判定用の距離（オブジェクトの中心から計測が開始される）
+    ///</summary>
+    private float groundCheckDistance = 1f;
+    ///<summary>
+    ///プレイヤーが地面に設置しているかどうか
+    ///</summary>
+    private bool isGrounded = false;
+
+    ///<summary>
+    ///現在の移動スピード
+    ///</summary>
+    private float currentSpeed = 0f;
+
+    ///<summary>
+    ///現在のスピードを取得するアクセス
+    ///</summary>
+    public float GetCurrentSpeed
+    {
+        get { return currentSpeed; }
+    }
+
+
     /// </summary>
     // Start is called before the first frame update
+    private void CheckGroundStatus()
+    {
+        //プレイヤーの足元から下に向かってRayを発射
+        RaycastHit hit;
+        if (Physics.Raycast(
+            playerTransform.position,
+            Vector3.down,
+            out hit,
+            groundCheckDistance))
+        {
+            isGrounded = true;//地面に接している
+        }
+        else
+        {
+            isGrounded = false;//空中にいる
+        }
+
+    }
     void Start()
     {
         //自分のTramsformを代入する
@@ -52,6 +103,9 @@ public class PlayerController : MonoBehaviour
         //カメラの前後・左右の方向を基準に移動ベクトルを計算
         Vector3 moveDirction = forward * frontPower + right * rightPower;
 
+        //currentSpeedにz軸（奥行方向の値を代入）
+        currentSpeed = moveDirction.z;
+
         return moveDirction;
     }
     // Update is called once per frame
@@ -63,27 +117,30 @@ public class PlayerController : MonoBehaviour
         rightPower = Input.GetAxis("Horizontal");
 
         //もし、frontPowerが0より大きかったら
-        if (frontPower > 0)
-        {
-            //z軸の方向に一秒に一メートル進む値を加算する
-            playerTransform.position += CalculateMoveDirection() * moveSpeed * Time.deltaTime;
-        }
-        if (frontPower < 0)
-        {
-            //z軸の方向に一秒にマイナス一メートル進む値を加算する
-            playerTransform.position += CalculateMoveDirection() * moveSpeed * Time.deltaTime;
-        }
-        if (rightPower > 0)
-        {
-            //x軸の方向に一秒に一メートル進む値を加算する
-            playerTransform.position += CalculateMoveDirection() * moveSpeed * Time.deltaTime;
-        }
-        if (rightPower < 0)
-        {
-            //x軸の方向に一秒にマイナス一メートル進む値を加算する
-            playerTransform.position += CalculateMoveDirection() * moveSpeed * Time.deltaTime;
-        }
 
+        //上下左右キーなどで値が入力された場合、カメラの向いている方向に動く
+       
+
+
+        //足元に向けてRaycastを行い、じめんにせっしているかをチェック
+        //移動方向を計算
+        Vector3 moveDirection = CalculateMoveDirection();
+        //足元に向けてRaycastを行い、地面に設置しているかをcheck
+
+        CheckGroundStatus();
+        //地面に設置している場合は重力を適用
+        if (isGrounded)
+        {
+            verticalVelocity = 0f;//地面に設置してる間は重力をリセット
+        }
+        else
+        {
+            verticalVelocity += gravity * Time.deltaTime;//地面に設置している間は重力をリセット
+        }
+        //移動方向にY軸の重力を加える
+        moveDirection.y = verticalVelocity;
+        //上下左右キーなどで値が入力された場合、カメラの向いている方向に動く
+        playerTransform.position += moveDirection * Time.deltaTime;
 
     }
 }
