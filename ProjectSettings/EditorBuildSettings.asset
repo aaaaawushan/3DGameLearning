@@ -8,4 +8,13 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/SampleScene.unity
     guid: 99c9720ab356a0642a771bea13969a05
+  - enabled: 1
+    path: Assets/Scenes/MonsterHunterLike.unity
+    guid: 759a55fbd70067242ac210ccfddb2d61
+  - enabled: 1
+    path: Assets/Scenes/GameOver.unity
+    guid: da3ea0b5a7dde5849a0fbc7532779e23
+  - enabled: 1
+    path: Assets/Scenes/Title.unity
+    guid: 7dc8c6841d6b04d408494fdce7e1f3c7
   m_configObjects: {}
